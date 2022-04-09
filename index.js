@@ -6,7 +6,9 @@ const mongoose = require("mongoose");
 //route import
 const authRoute = require("./routes/auth");
 const userRoute = require("./routes/user");
+const vendorRoute = require("./routes/vendor");
 const productRoute = require("./routes/product");
+const orderRoute = require("./routes/order");
 
 require("dotenv").config();
 const app = express();
@@ -36,6 +38,8 @@ async function run() {
         app.use("/auth", authRoute);
         app.use("/product", productRoute);
         app.use("/user", userRoute);
+        app.use("/vendor", vendorRoute);
+        app.use("/order", orderRoute);
     } finally {
         // await client.close();
     }

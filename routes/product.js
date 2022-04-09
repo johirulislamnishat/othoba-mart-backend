@@ -83,6 +83,7 @@ router.post("/add", async (req, res) => {
         const filePath = result.secure_url;
         // console.log(filePath);
         const newProduct = new Product({
+            vendor_id: req.body.vendor_id,
             product_img: filePath,
             product_name: req.body.product_name,
             product_description: req.body.product_description,
@@ -94,7 +95,7 @@ router.post("/add", async (req, res) => {
         });
         newProduct.save((err) => {
             if (err) {
-                // console.log(err);
+                console.log(err);
                 res.status(500).json({
                     status: 1,
                     error: "There was a server side error!",

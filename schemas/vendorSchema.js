@@ -1,13 +1,18 @@
 const mongoose = require("mongoose");
 
-const userSchema = mongoose.Schema(
+const vendorSchema = mongoose.Schema(
     {
-        user_name: {
+        vendor_name: {
             type: String,
             required: true,
             unique: true,
         },
         email: {
+            type: String,
+            required: true,
+            unique: true,
+        },
+        shop_name: {
             type: String,
             required: true,
             unique: true,
@@ -18,7 +23,7 @@ const userSchema = mongoose.Schema(
         },
         isVendor: {
             type: Boolean,
-            default: false,
+            default: true,
         },
         isAdmin: {
             type: Boolean,
@@ -28,8 +33,12 @@ const userSchema = mongoose.Schema(
             type: Boolean,
             default: true,
         },
+        status: {
+            type: String,
+            default: "Pending",
+        },
     },
     { timestamps: true }
 );
 
-module.exports = userSchema;
+module.exports = vendorSchema;
