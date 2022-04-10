@@ -17,16 +17,33 @@ const userSchema = mongoose.Schema(
             required: true,
         },
         isVendor: {
-            type: Boolean,
+            type: String,
             default: false,
         },
         isAdmin: {
             type: Boolean,
             default: false,
         },
-        isCustomer: {
+        isSuperAdmin: {
             type: Boolean,
+            default: false,
+        },
+        isCustomer: {
+            type: String,
             default: true,
+        },
+        shop_name: {
+            type: String,
+            unique: true,
+        },
+        shop: {
+            type: mongoose.Types.ObjectId,
+            ref: "Shop",
+        },
+        vendor_status: {
+            type: String,
+            enum: ["pending", "accepted", "rejected"],
+            default: "Pending",
         },
     },
     { timestamps: true }

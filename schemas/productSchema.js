@@ -2,10 +2,6 @@ const mongoose = require("mongoose");
 
 const productSchema = mongoose.Schema(
     {
-        vendor_id: {
-            type: String,
-            required: true,
-        },
         product_img: {
             type: String,
             required: true,
@@ -33,6 +29,10 @@ const productSchema = mongoose.Schema(
         },
         product_sizes: {
             type: Array,
+        },
+        shop: {
+            type: mongoose.Types.ObjectId,
+            ref: "Shop",
         },
     },
     { timestamps: true }

@@ -5,9 +5,8 @@ const jwt = require("jsonwebtoken");
 const userSchema = require("../schemas/userSchema");
 const User = new mongoose.model("User", userSchema);
 
-//register
+// customer register
 router.post("/register", async (req, res) => {
-    // console.log(req.body);
     const newUser = new User({
         user_name: req.body.user_name,
         email: req.body.email,
@@ -32,6 +31,35 @@ router.post("/register", async (req, res) => {
     });
 });
 
+// vendor register
+router.post("/register/vendor", async (req, res) => {
+    // console.log(req.body);
+    const newVendor = new User({
+        user_name: req.body.user_name,
+        email: req.body.email,
+        shop_name: req.body.shop_name,
+        isVendor: true,
+        password: CryptoJS.AES.encrypt(
+            req.body.password,
+            process.env.PASS_SECRET
+        ).toString(),
+    });
+    await newVendor.save((err) => {
+        if (err) {
+            // console.log(err);
+            res.status(500).json({
+                status: 1,
+                error: "There was a server side error!",
+            });
+        } else {
+            res.status(200).json({
+                status: 0,
+                message: "Vendor added successfully!",
+            });
+        }
+    });
+});
+
 //login
 router.post("/login", async (req, res) => {
     try {
@@ -50,7 +78,6 @@ router.post("/login", async (req, res) => {
         );
         const originalPassword = hashedPassword.toString(CryptoJS.enc.Utf8);
         const inputPassword = req.body.password;
-
         originalPassword !== inputPassword &&
             res.status(500).json({
                 status: 1,
@@ -60,7 +87,11 @@ router.post("/login", async (req, res) => {
             {
                 id: user._id,
                 isAdmin: user.isAdmin,
+                isSuperAdmin: user.isSuperAdmin,
                 isCustomer: user.isCustomer,
+                isVendor: user.isVendor,
+                vendor_status: user.vendor_status,
+                shop_id: user?.shop,
             },
             process.env.JWT_SEC,
             { expiresIn: "1d" }

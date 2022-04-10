@@ -8,6 +8,7 @@ const verifyToken = (req, res, next) => {
         jwt.verify(token, process.env.JWT_SEC, (err, user) => {
             if (err) res.status(403).json("Token is not valid!");
             req.user = user;
+            console.log(user);
             next();
         });
     } else {
@@ -48,8 +49,20 @@ const verifyTokenAndAdminOrVendor = (req, res, next) => {
     });
 };
 
+//admin or vendor or superadmin
+const verifyTokenAndSuperAdminOrVendor = (req, res, next) => {
+    verifyToken(req, res, () => {
+        if (req.user.isAdmin || req.user.isVendor || req.user.isSuperAdmin) {
+            next();
+        } else {
+            res.status(403).json("Unauthorized request!");
+        }
+    });
+};
+
 module.exports = {
     verifyTokenAndAuthorization,
     verifyTokenAndAdmin,
     verifyTokenAndAdminOrVendor,
+    verifyTokenAndSuperAdminOrVendor,
 };

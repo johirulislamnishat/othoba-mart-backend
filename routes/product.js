@@ -1,31 +1,39 @@
 const express = require("express");
 const { default: mongoose } = require("mongoose");
+const { verifyTokenAndAdminOrVendor } = require("./verifyToken");
+const { cloudinary } = require("../helper/cloudinary.config");
 const router = express.Router();
 const productSchema = require("../schemas/productSchema");
 const Product = new mongoose.model("Product", productSchema);
-const { verifyTokenAndAdminOrVendor } = require("./verifyToken");
-const { cloudinary } = require("../helper/cloudinary.config");
+const shopSchema = require("../schemas/shopSchema");
+const Shop = new mongoose.model("Shop", shopSchema);
 
 // get all products
 router.get("/", async (req, res) => {
-    await Product.find({}, (err, data) => {
-        if (err) {
-            res.status(500).json({
-                status: 1,
-                error: "There was a server side error!",
+    try {
+        await Product.find({})
+            .populate("shop", " -__v -createdAt -updatedAt -shop_products ")
+            .select(" -__v -createdAt -updatedAt")
+            .exec((err, data) => {
+                if (err) {
+                    res.status(500).json({
+                        status: 1,
+                        error: "There was a server side error!",
+                    });
+                } else {
+                    res.status(200).json({
+                        status: 0,
+                        result: data,
+                        message: "Products retrieve successfully!",
+                    });
+                }
             });
-        } else {
-            res.status(200).json({
-                status: 0,
-                result: data,
-                message: "Products retrieve successfully!",
-            });
-        }
-    })
-        .clone()
-        .catch(function (err) {
-            console.log(err);
+    } catch (err) {
+        res.status(500).json({
+            status: 1,
+            error: "There was a server side error!",
         });
+    }
 });
 
 // get paginated products
@@ -37,7 +45,6 @@ router.get("/paginated", async (req, res) => {
             .limit(limit * 1)
             .skip(page * limit)
             .exec();
-
         const count = await Product.countDocuments();
         res.status(200).json({
             status: 0,
@@ -74,60 +81,44 @@ router.get("/:id", async (req, res) => {
 });
 
 // add a product
-router.post("/add", async (req, res) => {
-    // console.log("body ", req.body);
-    // console.log("file ", req.files);
+router.post("/", verifyTokenAndAdminOrVendor, async (req, res) => {
     const file = req.files.photo;
-    await cloudinary.uploader.upload(file.tempFilePath, (err, result) => {
-        // console.log(result);
-        const filePath = result.secure_url;
-        // console.log(filePath);
-        const newProduct = new Product({
-            vendor_id: req.body.vendor_id,
-            product_img: filePath,
-            product_name: req.body.product_name,
-            product_description: req.body.product_description,
-            product_price: req.body.product_price,
-            product_category: req.body.product_category,
-            product_tags: req.body.product_tags,
-            product_colors: req.body.product_colors,
-            product_sizes: req.body.product_sizes,
-        });
-        newProduct.save((err) => {
-            if (err) {
-                console.log(err);
-                res.status(500).json({
-                    status: 1,
-                    error: "There was a server side error!",
+    try {
+        await cloudinary.uploader.upload(
+            file.tempFilePath,
+            async (err, result) => {
+                const filePath = result.secure_url;
+                const newProduct = new Product({
+                    ...req.body,
+                    product_img: filePath,
+                    shop: req.user.shop_id,
                 });
-            } else {
-                res.status(200).json({
-                    status: 0,
-                    message: "Product added successfully!",
-                });
+                const addProduct = await newProduct.save();
+                console.log(addProduct);
+                await Shop.updateOne(
+                    {
+                        _id: req.user.shop_id,
+                    },
+                    {
+                        $push: {
+                            shop_products: addProduct._id,
+                        },
+                    }
+                );
             }
+        );
+        res.status(200).json({
+            status: 0,
+            message: "Product added successfully!",
         });
-    });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({
+            status: 1,
+            error: "There was a server side error!",
+        });
+    }
 });
-
-// router.post("/add", verifyTokenAndAdminOrVendor, async (req, res) => {
-//     // console.log(req.body);
-//     const newProduct = new Product(req.body);
-//     await newProduct.save((err) => {
-//         if (err) {
-//             // console.log(err);
-//             res.status(500).json({
-//                 status: 1,
-//                 error: "There was a server side error!",
-//             });
-//         } else {
-//             res.status(200).json({
-//                 status: 0,
-//                 message: "Product added successfully!",
-//             });
-//         }
-//     });
-// });
 
 // delete a product
 router.delete("/:id", verifyTokenAndAdminOrVendor, async (req, res) => {

@@ -10,21 +10,23 @@ const {
 
 // FETCH USERS
 router.get("/all", verifyTokenAndAdmin, async (req, res) => {
-    await User.find({}, (err, data) => {
-        if (err) {
-            console.log(err);
-            res.status(500).json({
-                status: 1,
-                error: "There was a server side error!",
-            });
-        } else {
-            res.status(200).json({
-                status: 0,
-                result: data,
-                message: "Users data retrieve successfully!",
-            });
-        }
-    });
+    await User.find({})
+        .populate("shop", "-__v -createdAt -updatedAt -vendor")
+        .select("-__v -createdAt -updatedAt -password ")
+        .exec((err, data) => {
+            if (err) {
+                res.status(500).json({
+                    status: 1,
+                    error: "There was a server side error!",
+                });
+            } else {
+                res.status(200).json({
+                    status: 0,
+                    result: data,
+                    message: "Users data retrieve successfully!",
+                });
+            }
+        });
 });
 
 //GET SINGLE USER

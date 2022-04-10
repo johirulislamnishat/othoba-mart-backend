@@ -24,6 +24,14 @@ const orderSchema = mongoose.Schema(
         },
         purchased_items: [
             {
+                shop_id: {
+                    type: String,
+                    required: true,
+                },
+                shop_name: {
+                    type: String,
+                    required: true,
+                },
                 item_name: {
                     type: String,
                     required: true,
