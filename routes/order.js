@@ -6,11 +6,11 @@ const Order = new mongoose.model("Order", orderSchema);
 const { verifyTokenAndAuthorization } = require("./verifyToken");
 
 router.post("/place", verifyTokenAndAuthorization, async (req, res) => {
-    console.log(req.body);
+    // console.log(req.body);
     const newOrder = new Order(req.body);
     await newOrder.save((err) => {
         if (err) {
-            console.log(err);
+            // console.log(err);
             res.status(500).json({
                 status: 1,
                 error: "There was a server side error!",

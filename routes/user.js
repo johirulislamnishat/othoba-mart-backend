@@ -97,7 +97,7 @@ router.put(
             );
             res.status(200).json({
                 status: 0,
-                result: updatedUser,
+                // result: updatedUser,
                 message: "Password updated successfully!",
             });
         } catch (err) {
@@ -109,6 +109,7 @@ router.put(
         }
     }
 );
+
 //UPDATE SINGLE USER
 router.put("/:id", verifyTokenAndAuthorization, async (req, res) => {
     if (req.body.password) {
@@ -129,6 +130,30 @@ router.put("/:id", verifyTokenAndAuthorization, async (req, res) => {
             status: 0,
             result: updatedUser,
             message: "User data updated successfully!",
+        });
+    } catch (err) {
+        res.status(500).json({
+            status: 1,
+            error: "There was a server side error!",
+        });
+    }
+});
+
+// approve vendor
+router.put("/vendor/:id", verifyTokenAndAdmin, async (req, res) => {
+    try {
+        const updatedUser = await User.findByIdAndUpdate(
+            req.params.id,
+            {
+                $set: {
+                    status: "approved",
+                },
+            },
+            { new: true }
+        );
+        res.status(200).json({
+            status: 0,
+            message: "Vendor approved successfully!",
         });
     } catch (err) {
         res.status(500).json({

@@ -34,6 +34,10 @@ const productSchema = mongoose.Schema(
             type: mongoose.Types.ObjectId,
             ref: "Shop",
         },
+        status: {
+            type: String,
+            enum: ["featured", "best_selling", "new_arrival", "promoted"],
+        },
     },
     { timestamps: true }
 );

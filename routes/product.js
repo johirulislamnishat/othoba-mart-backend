@@ -120,6 +120,30 @@ router.post("/", verifyTokenAndAdminOrVendor, async (req, res) => {
     }
 });
 
+// approve vendor
+router.put("/status/:id", verifyTokenAndAdminOrVendor, async (req, res) => {
+    try {
+        const changeStatus = await Product.findByIdAndUpdate(
+            req.params.id,
+            {
+                $set: {
+                    status: req.body.status,
+                },
+            },
+            { new: true }
+        );
+        res.status(200).json({
+            status: 0,
+            message: "Product status changed successfully!",
+        });
+    } catch (err) {
+        res.status(500).json({
+            status: 1,
+            error: "There was a server side error!",
+        });
+    }
+});
+
 // delete a product
 router.delete("/:id", verifyTokenAndAdminOrVendor, async (req, res) => {
     const id = req.params.id;
