@@ -11,6 +11,7 @@ const orderRoute = require("./routes/order");
 const shopRoute = require("./routes/shop");
 const categoryRoute = require("./routes/category");
 const subCategoryRoute = require("./routes/subCategory");
+const paymentRoute = require("./routes/payment");
 
 require("dotenv").config();
 const app = express();
@@ -44,6 +45,7 @@ async function run() {
         app.use("/shop", shopRoute);
         app.use("/category", categoryRoute);
         app.use("/subcategory", subCategoryRoute);
+        app.use("/payment", paymentRoute);
     } finally {
         // await client.close();
     }

@@ -43,7 +43,7 @@ const userSchema = mongoose.Schema(
         vendor_status: {
             type: String,
             enum: ["pending", "approved", "rejected"],
-            default: "Pending",
+            default: "pending",
         },
     },
     { timestamps: true }

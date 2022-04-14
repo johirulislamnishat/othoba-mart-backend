@@ -17,7 +17,7 @@ router.post("/register", async (req, res) => {
     });
     await newUser.save((err) => {
         if (err) {
-            // console.log(err);
+            console.log(err);
             res.status(500).json({
                 status: 1,
                 error: "There was a server side error!",
