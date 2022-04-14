@@ -146,7 +146,7 @@ router.put("/vendor/:id", verifyTokenAndAdmin, async (req, res) => {
             req.params.id,
             {
                 $set: {
-                    status: "approved",
+                    vendor_status: req.body.status,
                 },
             },
             { new: true }

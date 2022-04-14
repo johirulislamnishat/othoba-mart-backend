@@ -50,6 +50,11 @@ const orderSchema = mongoose.Schema(
             type: Number,
             required: true,
         },
+        status: {
+            type: String,
+            enum: ["pending", "accepted", "shipped", "completed"],
+            default: "pending",
+        },
     },
     { timestamps: true }
 );

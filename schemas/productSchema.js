@@ -6,6 +6,9 @@ const productSchema = mongoose.Schema(
             type: String,
             required: true,
         },
+        gallery: {
+            type: Array,
+        },
         product_name: {
             type: String,
             required: true,
@@ -36,7 +39,15 @@ const productSchema = mongoose.Schema(
         },
         status: {
             type: String,
-            enum: ["featured", "best_selling", "new_arrival", "promoted"],
+            enum: [
+                "featured",
+                "best_selling",
+                "new_arrival",
+                "promoted",
+                "pending",
+                "regular",
+            ],
+            default: "pending",
         },
     },
     { timestamps: true }

@@ -83,6 +83,7 @@ router.get("/:id", async (req, res) => {
 // add a product
 router.post("/", verifyTokenAndAdminOrVendor, async (req, res) => {
     const file = req.files.photo;
+    let pro_id;
     try {
         await cloudinary.uploader.upload(
             file.tempFilePath,
@@ -94,7 +95,7 @@ router.post("/", verifyTokenAndAdminOrVendor, async (req, res) => {
                     shop: req.user.shop_id,
                 });
                 const addProduct = await newProduct.save();
-                console.log(addProduct);
+                pro_id = addProduct._id;
                 await Shop.updateOne(
                     {
                         _id: req.user.shop_id,
@@ -107,6 +108,48 @@ router.post("/", verifyTokenAndAdminOrVendor, async (req, res) => {
                 );
             }
         );
+        if (req.files.gallery !== "") {
+            let galleryImg = req.files?.gallery;
+            const isArr = Array.isArray(galleryImg);
+            if (isArr) {
+                galleryImg.map(async (item) => {
+                    await cloudinary.uploader.upload(
+                        item.tempFilePath,
+                        async (req, res) => {
+                            // await console.log(res.secure_url);
+                            await Product.updateOne(
+                                {
+                                    _id: pro_id,
+                                },
+                                {
+                                    $push: {
+                                        gallery: res.secure_url,
+                                    },
+                                }
+                            );
+                        }
+                    );
+                });
+            } else {
+                // console.log(galleryImg);
+                await cloudinary.uploader.upload(
+                    galleryImg.tempFilePath,
+                    async (req, res) => {
+                        // await console.log(res.secure_url);
+                        await Product.updateOne(
+                            {
+                                _id: pro_id,
+                            },
+                            {
+                                $push: {
+                                    gallery: res.secure_url,
+                                },
+                            }
+                        );
+                    }
+                );
+            }
+        }
         res.status(200).json({
             status: 0,
             message: "Product added successfully!",
