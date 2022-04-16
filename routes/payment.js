@@ -34,8 +34,8 @@ router.post("/", async (req, res) => {
                     quantity: item.quantity,
                 };
             }),
-            success_url: `${process.env.CLIENT_URL}/admin/home`,
-            cancel_url: `${process.env.CLIENT_URL}/admin/home`,
+            success_url: `${process.env.CLIENT_URL}/admin/orders`,
+            cancel_url: `${process.env.CLIENT_URL}/admin/orders`,
         });
         res.json({ url: session.url });
     } catch (err) {
